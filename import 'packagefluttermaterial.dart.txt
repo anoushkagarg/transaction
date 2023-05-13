@@ -1,0 +1,150 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(EWalletApp());
+}
+
+class EWalletApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'E-Wallet App',
+      home: ContactPage(),
+    );
+  }
+}
+
+class ContactPage extends StatefulWidget {
+  @override
+  _ContactPageState createState() => _ContactPageState();
+}
+
+class _ContactPageState extends State<ContactPage> {
+  List<String> contacts = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+  ];
+
+  String selectedContact = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Select Contact'),
+      ),
+      body: Column(
+        children: <Widget>[
+          TextField(
+            onChanged: (value) {
+              setState(() {
+                selectedContact = value;
+              });
+            },
+            decoration: InputDecoration(
+              labelText: 'Search Contact',
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: contacts.length,
+              itemBuilder: (context, index) {
+                if (selectedContact.isEmpty ||
+                    contacts[index].toLowerCase().contains(selectedContact.toLowerCase())) {
+                  return ListTile(
+                    title: Text(contacts[index]),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SendMoneyPage(
+                            contactName: contacts[index],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  return SizedBox();
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SendMoneyPage extends StatefulWidget {
+  final String contactName;
+
+  SendMoneyPage({required this.contactName});
+
+  @override
+  _SendMoneyPageState createState() => _SendMoneyPageState();
+}
+
+class _SendMoneyPageState extends State<SendMoneyPage> {
+  TextEditingController amountController = TextEditingController();
+
+  @override
+  void dispose() {
+    amountController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Send Money'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('Selected Contact: ${widget.contactName}'),
+            SizedBox(height: 10.0),
+            TextField(
+              controller: amountController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Amount',
+              ),
+            ),
+            SizedBox(height: 10.0),
+            ElevatedButton(
+              onPressed: () {
+                String amount = amountController.text;
+                // Perform the transaction logic here
+
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Payment Successful'),
+                    content: Text('Amount: \Rs.$amount sent to ${widget.contactName}'),
+                    actions: [
+                      TextButton(
+                        child: Text('OK'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: Text('Pay'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
